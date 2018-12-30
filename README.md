@@ -1,8 +1,14 @@
-# The api Project
+# The api Project（小程序服务端示例）
 
 ## About
 
-Describe your project here.
+加入使用微信code登录并预存登录信息，发送短信验证码，补全个人资料
+
+##使用的开源框架
+
+1、springboot
+2、shiro
+3、jfinal
 
 ## Prerequisites
 
