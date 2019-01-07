@@ -1,9 +1,9 @@
 package com.demo.api.common.util;
 
-import com.demo.api.common.domain.JwtToken;
-import com.google.gson.Gson;
 import com.demo.api.common.GlobalConstParam;
-import com.demo.api.user.domain.LoginUserInfo;
+import com.demo.api.common.domain.JwtToken;
+import com.demo.api.user.vo.LoginUserInfo;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -64,7 +64,8 @@ public class JwtRealm extends AuthorizingRealm {
             throw new AuthenticationException("登录信息已过期，请重新登录");
         }
         LoginUserInfo loginUserInfo = new Gson().fromJson(accountJson, LoginUserInfo.class);
-        return new SimpleAuthenticationInfo(loginUserInfo.getWechatId(), jwtToken.getCredentials(), loginUserInfo.getNickName());
+        loginUserInfo.setWechatId(openId);
+        return new SimpleAuthenticationInfo(loginUserInfo, jwtToken.getCredentials(), getName());
     }
 
     /**
@@ -76,9 +77,7 @@ public class JwtRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        String openId = (String) principalCollection.getPrimaryPrincipal();
-        String content = redisOperator.get(GlobalConstParam.WECHAT_USER.concat("_").concat(openId));
-        LoginUserInfo loginUserInfo = GsonUtils.fromJson(content, LoginUserInfo.class);
+        LoginUserInfo loginUserInfo = (LoginUserInfo) principalCollection.getPrimaryPrincipal();
         authorizationInfo.setStringPermissions(loginUserInfo.getPermissions());
         return authorizationInfo;
     }

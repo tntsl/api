@@ -1,8 +1,8 @@
 package com.demo.api.common.util;
 
-import com.demo.api.common.domain.SystemInfo;
-import com.demo.api.user.domain.LoginUserInfo;
 import com.demo.api.common.GlobalConstParam;
+import com.demo.api.common.domain.SystemInfo;
+import com.demo.api.user.vo.LoginUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -214,14 +214,37 @@ public class RedisOperator {
      * @param openId
      * @return
      */
-    public void setLoginUserInfoByOpenId(String openId, String loginUserInfoJson) {
+    public void setLoginUserInfoByOpenId(String openId, LoginUserInfo loginUserInfoJson) {
         String loginUserInfoKey = GlobalConstParam.WECHAT_USER.concat("_").concat(openId);
-        set(loginUserInfoKey, loginUserInfoJson);
+        set(loginUserInfoKey, GsonUtils.toJson(loginUserInfoJson));
         Integer expire = 12;
         if (systemInfo.getTokenExpire() != null) {
             expire = systemInfo.getTokenExpire();
         }
         expire(loginUserInfoKey, 60 * 60 * expire);
+    }
+
+    /**
+     * 根据手机号获取redis中存储的验证码
+     *
+     * @param mobile
+     * @return
+     */
+    public String getVerifyCodeByMobile(String mobile) {
+        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        return get(verifyCodeKey);
+    }
+
+    /**
+     * redis中存储已经发送的手机验证码，有效期5分钟
+     *
+     * @param mobile
+     * @param verifyCode
+     */
+    public void setVerifyCodeByMobile(String mobile, String verifyCode) {
+        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        set(verifyCodeKey, verifyCode);
+        expire(verifyCodeKey, 60 * 5);
     }
 
 }

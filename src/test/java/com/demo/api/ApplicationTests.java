@@ -1,6 +1,5 @@
 package com.demo.api;
 
-import com.jfinal.kit.PathKit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -22,17 +21,6 @@ public class ApplicationTests {
 
     @Test
     public void testHome() throws Exception {
-        log.info("------>>>>>" + PathKit.getWebRootPath());
-    }
-
-    @Test
-    public void testFindAll() throws Exception {
-
-
-    }
-
-    @Test
-    public void testGetGpsByDate() throws Exception {
-
+        log.info("------>>>>>");
     }
 }
