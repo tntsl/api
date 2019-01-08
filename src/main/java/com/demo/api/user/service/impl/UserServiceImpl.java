@@ -3,7 +3,7 @@ package com.demo.api.user.service.impl;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.exception.PreRegistFailException;
 import com.demo.api.common.exception.RegistFailException;
-import com.demo.api.common.exception.VerifyCodeException;
+import com.demo.api.common.exception.SendVerifyCodeFailException;
 import com.demo.api.common.exception.WechatLoginException;
 import com.demo.api.common.service.JwtUtils;
 import com.demo.api.common.service.RedisOperator;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyCode(ReqForVerifyCode reqForVerifyCode) throws VerifyCodeException {
+    public void verifyCode(ReqForVerifyCode reqForVerifyCode) throws SendVerifyCodeFailException {
         String mobile = reqForVerifyCode.getMobile();
         Integer mobileVerifyCodeLimit = redisOperator.getMobileVerifyCodeLimit(mobile);
         Integer limitTimes = systemInfo.getShortMessage().getLimitTimes();
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
             limitTimes = 5;
         }
         if (mobileVerifyCodeLimit >= limitTimes) {
-            throw new VerifyCodeException("验证码获取已达到最大次数，请明天再试");
+            throw new SendVerifyCodeFailException("验证码获取已达到最大次数，请明天再试");
         }
         String verifyCode = RandomStringUtils.randomNumeric(6);
         String sendMessageResult = shortMessageService.sendMessage(mobile, systemInfo.getShortMessage().getVerifyCodeTemplate().replace("%验证码%", verifyCode));

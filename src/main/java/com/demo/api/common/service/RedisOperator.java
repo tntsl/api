@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +52,16 @@ public class RedisOperator {
      */
     public void expire(String key, long timeout) {
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 指定过期时间
+     *
+     * @param key
+     * @param date
+     */
+    public void expireAt(String key, Date date) {
+        redisTemplate.expireAt(key, date);
     }
 
     /**
@@ -266,10 +278,19 @@ public class RedisOperator {
      * @return
      */
     public Integer getMobileVerifyCodeLimit(String mobile) {
-        String sentCount = hget(GlobalConst.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile);
+        String mobileRegistVerifycodeLimit = GlobalConst.MOBILE_REGIST_VERIFYCODE_LIMIT;
+        String sentCount = hget(mobileRegistVerifycodeLimit, mobile);
         if (StringUtils.isNotBlank(sentCount)) {
             return Integer.valueOf(sentCount);
         }
+        hset(mobileRegistVerifycodeLimit, mobile, "0");
+        Calendar calendar = Calendar.getInstance();
+        long currentTimeInMillis = calendar.getTimeInMillis();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        expire(mobileRegistVerifycodeLimit, (calendar.getTimeInMillis() - currentTimeInMillis) / 1000);
         return 0;
     }
 

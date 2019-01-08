@@ -51,18 +51,16 @@ public class JwtFilter extends AuthenticatingFilter {
 
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) {
-        HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
-        String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
-        if (StringUtils.isBlank(token)) {
+        AuthenticationToken token = createToken(request, response);
+        if (token == null) {
             return false;
         }
-        JwtToken jwtToken = new JwtToken(token);
-        getSubject(request, response).login(jwtToken);
+        getSubject(request, response).login(token);
         return true;
     }
 
     @Override
-    protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
+    protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
         String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
         if (StringUtils.isNotBlank(token)) {

@@ -3,7 +3,7 @@ package com.demo.api.user.controller;
 import com.demo.api.common.domain.Result;
 import com.demo.api.common.exception.PreRegistFailException;
 import com.demo.api.common.exception.RegistFailException;
-import com.demo.api.common.exception.VerifyCodeException;
+import com.demo.api.common.exception.SendVerifyCodeFailException;
 import com.demo.api.common.exception.WechatLoginException;
 import com.demo.api.common.util.ValidResultUtils;
 import com.demo.api.user.service.UserService;
@@ -61,7 +61,7 @@ public class UserController {
         try {
             userService.verifyCode(reqForVerifyCode);
             return new Result().set200().setMessage("验证码短信已发送");
-        } catch (VerifyCodeException e) {
+        } catch (SendVerifyCodeFailException e) {
             return new Result().set500().setMessage(e.getMessage());
         }
     }
