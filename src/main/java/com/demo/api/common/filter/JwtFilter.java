@@ -32,7 +32,7 @@ public class JwtFilter extends AuthenticatingFilter {
     }
 
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
         HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
@@ -45,11 +45,6 @@ public class JwtFilter extends AuthenticatingFilter {
                 sendErrorMessage(response, e.getMessage());
             }
         }
-        return false;
-    }
-
-    @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         sendErrorMessage(response, "token无效");
         return false;
     }

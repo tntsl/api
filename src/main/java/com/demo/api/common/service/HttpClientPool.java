@@ -1,4 +1,4 @@
-package com.demo.api.common.util;
+package com.demo.api.common.service;
 
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;

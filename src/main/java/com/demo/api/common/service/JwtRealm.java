@@ -1,6 +1,6 @@
-package com.demo.api.common.util;
+package com.demo.api.common.service;
 
-import com.demo.api.common.GlobalConstParam;
+import com.demo.api.common.GlobalConst;
 import com.demo.api.common.domain.JwtToken;
 import com.demo.api.user.vo.LoginUserInfo;
 import com.google.gson.Gson;
@@ -59,7 +59,7 @@ public class JwtRealm extends AuthorizingRealm {
         if (StringUtils.isBlank(openId)) {
             throw new AuthenticationException("token信息有误");
         }
-        String accountJson = redisOperator.get(GlobalConstParam.WECHAT_USER.concat("_").concat(openId));
+        String accountJson = redisOperator.get(GlobalConst.WECHAT_USER.concat("_").concat(openId));
         if (StringUtils.isBlank(accountJson)) {
             throw new AuthenticationException("登录信息已过期，请重新登录");
         }

@@ -3,7 +3,7 @@ package com.demo.api.wechat.service;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.exception.WechatLoginException;
 import com.demo.api.common.util.GsonUtils;
-import com.demo.api.common.util.HttpClientPool;
+import com.demo.api.common.service.HttpClientPool;
 import com.demo.api.wechat.domain.RepForWechatSession;
 import com.google.common.collect.Lists;
 import org.apache.http.NameValuePair;

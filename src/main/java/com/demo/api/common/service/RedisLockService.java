@@ -1,4 +1,4 @@
-package com.demo.api.common.util;
+package com.demo.api.common.service;
 
 
 import org.apache.commons.lang3.StringUtils;

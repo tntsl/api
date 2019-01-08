@@ -3,9 +3,9 @@ package com.demo.api.common;
 /**
  * @author Lye
  */
-public class GlobalConstParam {
+public class GlobalConst {
 
-    private GlobalConstParam() {
+    private GlobalConst() {
 
     }
 

@@ -1,7 +1,8 @@
-package com.demo.api.common.util;
+package com.demo.api.common.service;
 
-import com.demo.api.common.GlobalConstParam;
+import com.demo.api.common.GlobalConst;
 import com.demo.api.common.domain.SystemInfo;
+import com.demo.api.common.util.GsonUtils;
 import com.demo.api.user.vo.LoginUserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,7 +206,7 @@ public class RedisOperator {
      * @return
      */
     public LoginUserInfo getLoginUserInfoByOpenId(String openId) {
-        String loginUserInfoJson = get(GlobalConstParam.WECHAT_USER.concat("_").concat(openId));
+        String loginUserInfoJson = get(GlobalConst.WECHAT_USER.concat("_").concat(openId));
         return GsonUtils.fromJson(loginUserInfoJson, LoginUserInfo.class);
     }
 
@@ -216,7 +217,7 @@ public class RedisOperator {
      * @return
      */
     public void setLoginUserInfoByOpenId(String openId, LoginUserInfo loginUserInfoJson) {
-        String loginUserInfoKey = GlobalConstParam.WECHAT_USER.concat("_").concat(openId);
+        String loginUserInfoKey = GlobalConst.WECHAT_USER.concat("_").concat(openId);
         set(loginUserInfoKey, GsonUtils.toJson(loginUserInfoJson));
         Integer expire = 12;
         if (systemInfo.getTokenExpire() != null) {
@@ -232,7 +233,7 @@ public class RedisOperator {
      * @return
      */
     public String getVerifyCodeByMobile(String mobile) {
-        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        String verifyCodeKey = GlobalConst.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
         return get(verifyCodeKey);
     }
 
@@ -243,7 +244,7 @@ public class RedisOperator {
      * @param verifyCode
      */
     public void setVerifyCodeByMobile(String mobile, String verifyCode) {
-        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        String verifyCodeKey = GlobalConst.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
         set(verifyCodeKey, verifyCode);
         expire(verifyCodeKey, 60 * 5);
     }
@@ -254,7 +255,7 @@ public class RedisOperator {
      * @param mobile
      */
     public void delVerifyCodeByMobile(String mobile) {
-        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        String verifyCodeKey = GlobalConst.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
         del(verifyCodeKey);
     }
 
@@ -265,7 +266,7 @@ public class RedisOperator {
      * @return
      */
     public Integer getMobileVerifyCodeLimit(String mobile) {
-        String sentCount = hget(GlobalConstParam.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile);
+        String sentCount = hget(GlobalConst.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile);
         if (StringUtils.isNotBlank(sentCount)) {
             return Integer.valueOf(sentCount);
         }
@@ -281,7 +282,7 @@ public class RedisOperator {
     public void increaseMobileVerifyCodeSentCount(String mobile) {
         Integer mobileVerifyCodeLimit = getMobileVerifyCodeLimit(mobile);
         mobileVerifyCodeLimit++;
-        hset(GlobalConstParam.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile, String.valueOf(mobileVerifyCodeLimit));
+        hset(GlobalConst.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile, String.valueOf(mobileVerifyCodeLimit));
     }
 
 }
