@@ -1,10 +1,11 @@
 package com.demo.api.common.config;
 
-import com.demo.api.common.util.JwtRealm;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.filter.JwtFilter;
 import com.demo.api.common.filter.UrlRewriteFilter;
+import com.demo.api.common.util.JwtRealm;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -72,13 +73,20 @@ public class ShiroConfig {
         return defaultAdvisorAutoProxyCreator;
     }
 
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
+    }
+
     @Bean("shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         Map<String, Filter> filterMap = new HashMap(1);
         filterMap.put("jwt", new JwtFilter(systemInfo));
         factoryBean.setFilters(filterMap);
-        factoryBean.setSecurityManager(securityManager());
+        factoryBean.setSecurityManager(securityManager);
         Map<String, String> filterRuleMap = new HashMap(9);
         filterRuleMap.put("/user/wechatLogin", "anon");
         filterRuleMap.put("/error/**", "anon");

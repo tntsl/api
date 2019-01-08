@@ -3,6 +3,7 @@ package com.demo.api.user.controller;
 import com.demo.api.common.domain.Result;
 import com.demo.api.common.exception.PreRegistFailException;
 import com.demo.api.common.exception.RegistFailException;
+import com.demo.api.common.exception.VerifyCodeException;
 import com.demo.api.common.exception.WechatLoginException;
 import com.demo.api.common.util.ValidResultUtils;
 import com.demo.api.user.service.UserService;
@@ -12,6 +13,7 @@ import com.demo.api.user.vo.ReqForVerifyCode;
 import com.demo.api.user.vo.ReqForWechatLogin;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -33,6 +35,7 @@ public class UserController {
     private UserService userService;
 
     @ApiOperation("微信登录")
+    @RequiresGuest
     @PostMapping("wechatLogin")
     public Result<LoginUserInfo> wechatLogin(@RequestBody @Valid ReqForWechatLogin reqForWechatLogin, BindingResult validResult) {
         if (validResult.hasErrors()) {
@@ -55,8 +58,12 @@ public class UserController {
         if (validResult.hasErrors()) {
             return new Result().set400().setMessage(ValidResultUtils.resultsToString(validResult));
         }
-        userService.verifyCode(reqForVerifyCode);
-        return new Result().set200().setMessage("验证码短信已发送");
+        try {
+            userService.verifyCode(reqForVerifyCode);
+            return new Result().set200().setMessage("验证码短信已发送");
+        } catch (VerifyCodeException e) {
+            return new Result().set500().setMessage(e.getMessage());
+        }
     }
 
     @ApiOperation("补充信息")

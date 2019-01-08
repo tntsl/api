@@ -3,6 +3,7 @@ package com.demo.api.common.util;
 import com.demo.api.common.GlobalConstParam;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.user.vo.LoginUserInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -245,6 +246,42 @@ public class RedisOperator {
         String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
         set(verifyCodeKey, verifyCode);
         expire(verifyCodeKey, 60 * 5);
+    }
+
+    /**
+     * 根据手机号删除以获取的验证码
+     *
+     * @param mobile
+     */
+    public void delVerifyCodeByMobile(String mobile) {
+        String verifyCodeKey = GlobalConstParam.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
+        del(verifyCodeKey);
+    }
+
+    /**
+     * 根据手机号获取已发送验证码次数
+     *
+     * @param mobile
+     * @return
+     */
+    public Integer getMobileVerifyCodeLimit(String mobile) {
+        String sentCount = hget(GlobalConstParam.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile);
+        if (StringUtils.isNotBlank(sentCount)) {
+            return Integer.valueOf(sentCount);
+        }
+        return 0;
+    }
+
+    /**
+     * 根据手机号对已发送验证码次数加一
+     *
+     * @param mobile
+     * @return
+     */
+    public void increaseMobileVerifyCodeSentCount(String mobile) {
+        Integer mobileVerifyCodeLimit = getMobileVerifyCodeLimit(mobile);
+        mobileVerifyCodeLimit++;
+        hset(GlobalConstParam.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile, String.valueOf(mobileVerifyCodeLimit));
     }
 
 }

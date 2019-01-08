@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.demo.api.common.domain.SystemInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,7 @@ import java.util.Date;
  */
 @Component
 public class JwtUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtils.class);
 
     @Autowired
     private SystemInfo systemInfo;
@@ -47,7 +50,8 @@ public class JwtUtils {
         try {
             decodeJwtToken(token);
             return true;
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
+            LOGGER.trace(e.getMessage(), e);
             return false;
         }
     }

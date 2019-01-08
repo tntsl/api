@@ -9,6 +9,8 @@ spring:
   jackson:
     time-zone: GMT+8
     default-property-inclusion: non_null
+  aop:
+    proxy-target-class: true
 mybatis-plus:
   global-config:
     db-config:

@@ -1,8 +1,8 @@
 package com.demo.api.common.filter;
 
 import com.demo.api.common.domain.JwtToken;
-import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.domain.Result;
+import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.util.GsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -41,6 +41,7 @@ public class JwtFilter extends AuthenticatingFilter {
             try {
                 return executeLogin(request, response);
             } catch (Exception e) {
+                LOGGER.trace(e.getMessage(), e);
                 sendErrorMessage(response, e.getMessage());
             }
         }

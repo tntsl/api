@@ -3,6 +3,7 @@ package com.demo.api.user.service.impl;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.exception.PreRegistFailException;
 import com.demo.api.common.exception.RegistFailException;
+import com.demo.api.common.exception.VerifyCodeException;
 import com.demo.api.common.exception.WechatLoginException;
 import com.demo.api.common.util.JwtUtils;
 import com.demo.api.common.util.RedisOperator;
@@ -70,11 +71,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyCode(ReqForVerifyCode reqForVerifyCode) {
+    public void verifyCode(ReqForVerifyCode reqForVerifyCode) throws VerifyCodeException {
         String mobile = reqForVerifyCode.getMobile();
+        Integer mobileVerifyCodeLimit = redisOperator.getMobileVerifyCodeLimit(mobile);
+        Integer limitTimes = systemInfo.getShortMessage().getLimitTimes();
+        if (limitTimes == null) {
+            limitTimes = 5;
+        }
+        if (mobileVerifyCodeLimit >= limitTimes) {
+            throw new VerifyCodeException("验证码获取已达到最大次数，请明天再试");
+        }
         String verifyCode = RandomStringUtils.randomNumeric(6);
         String sendMessageResult = shortMessageService.sendMessage(mobile, systemInfo.getShortMessage().getVerifyCodeTemplate().replace("%验证码%", verifyCode));
         redisOperator.setVerifyCodeByMobile(mobile, verifyCode);
+        redisOperator.increaseMobileVerifyCodeSentCount(mobile);
         LOGGER.info("手机号：{} 验证码：{} 发送结果：{}", mobile, verifyCode, sendMessageResult);
     }
 
@@ -85,13 +95,15 @@ public class UserServiceImpl implements UserService {
         if (loginUserInfo.getIsActived()) {
             throw new RegistFailException("您已补充个人信息，请不要重复操作");
         }
-        String RealVerifyCode = redisOperator.getVerifyCodeByMobile(reqForRegist.getMobile());
+        String mobile = reqForRegist.getMobile();
+        String RealVerifyCode = redisOperator.getVerifyCodeByMobile(mobile);
         if (StringUtils.isBlank(RealVerifyCode)) {
             throw new RegistFailException("验证码过期，请重新获取");
         }
         if (!RealVerifyCode.equalsIgnoreCase(reqForRegist.getVerifyCode())) {
             throw new RegistFailException("验证码错误，请重新输入");
         }
+        redisOperator.delVerifyCodeByMobile(mobile);
         User user = userMapper.getUserByOpenId(loginUserInfo.getWechatId());
         user.setIsActived(true);
         int updatedUserCount = userMapper.updateById(user);
@@ -101,7 +113,7 @@ public class UserServiceImpl implements UserService {
         PropertyOwner propertyOwner = new PropertyOwner();
         propertyOwner.setBelongAccount(user.getId());
         propertyOwner.setName(reqForRegist.getName());
-        propertyOwner.setMobile(reqForRegist.getMobile());
+        propertyOwner.setMobile(mobile);
         propertyOwner.setCertificate(reqForRegist.getCertificateType());
         propertyOwner.setIdCard(reqForRegist.getCertificateId());
         propertyOwner.setType(PropertyOwner.OWNER_TYPE_USER_INFO);

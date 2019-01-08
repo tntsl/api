@@ -28,7 +28,7 @@ public class JwtRealm extends AuthorizingRealm {
 
     @Override
     public String getName() {
-        return JwtRealm.class.getSimpleName();
+        return "jwtRealm";
     }
 
     @Override
