@@ -1,10 +1,14 @@
 package com.demo.api.common.config;
 
-import com.demo.api.common.util.JwtRealm;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.filter.JwtFilter;
 import com.demo.api.common.filter.UrlRewriteFilter;
+import com.demo.api.common.service.JwtRealm;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -43,11 +47,34 @@ public class ShiroConfig {
     }
 
     @Bean
-    public DefaultWebSecurityManager securityManager() {
-        DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        // 设置realm.
-        defaultWebSecurityManager.setRealm(jwtRealm());
-        return defaultWebSecurityManager;
+    public DefaultSessionManager sessionManager() {
+        DefaultSessionManager sessionManager = new DefaultSessionManager();
+        sessionManager.setSessionValidationSchedulerEnabled(false);
+        return sessionManager;
+    }
+
+    @Bean
+    public DefaultSessionStorageEvaluator sessionStorageEvaluator() {
+        DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        return sessionStorageEvaluator;
+    }
+
+    @Bean
+    public DefaultSubjectDAO subjectDAO(DefaultSessionStorageEvaluator sessionStorageEvaluator) {
+        DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
+        return subjectDAO;
+    }
+
+
+    @Bean
+    public DefaultWebSecurityManager securityManager(Realm jwtRealm, DefaultSubjectDAO subjectDAO, DefaultSessionManager sessionManager) {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        securityManager.setRealm(jwtRealm);
+        securityManager.setSubjectDAO(subjectDAO);
+        securityManager.setSessionManager(sessionManager);
+        return securityManager;
     }
 
     @Bean
@@ -72,13 +99,20 @@ public class ShiroConfig {
         return defaultAdvisorAutoProxyCreator;
     }
 
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
+    }
+
     @Bean("shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         Map<String, Filter> filterMap = new HashMap(1);
         filterMap.put("jwt", new JwtFilter(systemInfo));
         factoryBean.setFilters(filterMap);
-        factoryBean.setSecurityManager(securityManager());
+        factoryBean.setSecurityManager(securityManager);
         Map<String, String> filterRuleMap = new HashMap(9);
         filterRuleMap.put("/user/wechatLogin", "anon");
         filterRuleMap.put("/error/**", "anon");
@@ -91,5 +125,14 @@ public class ShiroConfig {
         factoryBean.setFilterChainDefinitionMap(filterRuleMap);
         return factoryBean;
     }
+
+
+    /*@Bean
+    public MethodInvokingFactoryBean methodInvokingFactoryBean(DefaultSecurityManager securityManager) {
+        MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
+        methodInvokingFactoryBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
+        methodInvokingFactoryBean.setArguments(securityManager);
+        return methodInvokingFactoryBean;
+    }*/
 
 }

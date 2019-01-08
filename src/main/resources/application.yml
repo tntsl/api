@@ -1,23 +1,25 @@
 spring:
   profiles:
     active: dev
-  datasource:
-    ds1:
-      #      driver-class-name: com.mysql.jdbc.Driver
-      driver-class-name: net.sf.log4jdbc.DriverSpy
-      type: com.zaxxer.hikari.HikariDataSource
-      pool-name: DatebookHikariCP1
-      minimum-idle: 5
-      maximum-pool-size: 155
-      auto-commit: true
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-timeout: 30000
-      connection-test-query: SELECT 1
-    ds2:
-      #      driver-class-name: com.mysql.jdbc.Driver
-      driver-class-name: net.sf.log4jdbc.DriverSpy
-      type: com.zaxxer.hikari.HikariDataSource
-      pool-name: DatebookHikariCP2
-server:
-  port: 80
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
+  jackson:
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+  aop:
+    proxy-target-class: true
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+      field-strategy: not_empty
+      table-underline: true
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+  type-aliases-package: com.demo.api.domain

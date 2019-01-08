@@ -1,33 +1,27 @@
 spring:
   application:
-    name: mini-program
+    name: api
   datasource:
-    ds1:
-      url: jdbc:log4jdbc:mysql://localhost:3306/api?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true
-      username: root
-      password: root
-  servlet:
-    multipart:
-      max-file-size: 20Mb
-      max-request-size: 20Mb
+    url: jdbc:log4jdbc:mysql://localhost:3306/api?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: net.sf.log4jdbc.DriverSpy
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: DatebookHikariCP
+      minimum-idle: 5
+      maximum-pool-size: 100
+      auto-commit: true
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
   redis:
     host: localhost
     port: 6379
-  jackson:
-    time-zone: GMT+8
-    default-property-inclusion: non_null
   data:
     mongodb:
       uri: mongodb://mini-program:mini-program@localhost:27017/mp
-# See: https://github.com/javamelody/javamelody/wiki/UserGuide#6-optional-parameters
-javamelody:
-  #advisor-auto-proxy-creator-enabled: false
-  init-parameters:
-    log: true
-    url-exclude-pattern: (/webjars/.*|/static/.*|/css/.*|/images/.*|/fonts/.*|/js/.*)
-    authorized-users: admin:admin
-    storage-directory: /tmp/javamelody
-    #monitoring-path: /admin/performance
 management:
   endpoints:
     web:
@@ -44,48 +38,27 @@ management:
         listenForHttpService: true
         debug: true
 swagger:
-  #  enabled: false
+  enabled: true
   title: 小程序Api
   description:  用于给小程序提供功能后台
-  version:  0.1.0.Beta
+  version:  1.0.0
   license:  Apache License, Version 2.0
   licenseUrl:  https://www.apache.org/licenses/LICENSE-2.0.html
   #  termsOfServiceUrl:  https://github.com/dyc87112/spring-boot-starter-swagger
   contact:
     name: 负责人
+    email: 1@2.com
   base-package:  com.demo.api
-  global-operation-parameters[0]:
-    name: x-authentication-token
-    description: 从登陆接口获取，除登录接口外，所有接口请求都需要传入
-    modelRef: string
-    parameterType: header
-    required: false
-  global-operation-parameters[1]:
-    name: v
-    description: 版本信息，当前值为 1.0
-    modelRef: string
-    parameterType: query
-    required:  true
-  global-operation-parameters[2]:
-    name: refer
-    description: pc,h5-pc,h5-mb,app,hiq(根据自身选择其一)
-    modelRef: string
-    parameterType: header
-    required: false
-  apply-default-response-messages:  true
-  global-response-message:
-    get[0]:
-      code: 401
-      message: 401get
-    get[1]:
-      code: 500
-      message: 500get
-      modelRef: ERROR
+  global-operation-parameters:
+    - name: x-authentication-token
+      description: 从登陆接口获取，除登录接口外，所有接口请求都需要传入
+      modelRef: string
+      parameterType: header
+      required: false
   ui-config:
     json-editor: true
-    show-request-headers: true
-    request-timeout: 5000
-    submit-methods: get,delete
+  global-response-message:
+    post:
 api:
   #后台filter取token时的请求头
   token-header: x-authentication-token
@@ -119,3 +92,8 @@ api:
     verify-code-template: 【公司名】验证码：%验证码%，有效期为5分钟，感谢您的使用。提示：请勿泄露给他人
     #每天每个号码发送短信次数限制
     limit-times: 5
+logging:
+  level:
+    root: info
+server:
+  port: 80

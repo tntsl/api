@@ -1,14 +1,14 @@
 package com.demo.api.wechat.service;
 
 import com.google.gson.Gson;
-import com.demo.api.common.GlobalConstParam;
+import com.demo.api.common.GlobalConst;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.domain.Wechat;
 import com.demo.api.wechat.domain.RepForAccessToken;
 import com.demo.api.wechat.domain.RepForSendMessageByTemplate;
 import com.demo.api.wechat.domain.ReqForSendMessageByTemplate;
-import com.demo.api.common.util.HttpClientPool;
-import com.demo.api.common.util.RedisOperator;
+import com.demo.api.common.service.HttpClientPool;
+import com.demo.api.common.service.RedisOperator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -43,7 +43,7 @@ public class TemplateMsgService {
      */
     public String getAccessToken() {
         Wechat wechat = systemInfo.getWechat();
-        String accessToken = redisOperator.get(GlobalConstParam.TEMPLATE_MESSAGE_ACCESS_TOKEN);
+        String accessToken = redisOperator.get(GlobalConst.TEMPLATE_MESSAGE_ACCESS_TOKEN);
         if (StringUtils.isNotBlank(accessToken)) {
             return accessToken;
         } else {
@@ -54,8 +54,8 @@ public class TemplateMsgService {
                 String content = EntityUtils.toString(entity);
                 RepForAccessToken repForAccessToken = new Gson().fromJson(content, RepForAccessToken.class);
                 accessToken = repForAccessToken.getAccessToken();
-                redisOperator.set(GlobalConstParam.TEMPLATE_MESSAGE_ACCESS_TOKEN, accessToken);
-                redisOperator.expire(GlobalConstParam.TEMPLATE_MESSAGE_ACCESS_TOKEN, 3540L*1000);
+                redisOperator.set(GlobalConst.TEMPLATE_MESSAGE_ACCESS_TOKEN, accessToken);
+                redisOperator.expire(GlobalConst.TEMPLATE_MESSAGE_ACCESS_TOKEN, 3540L*1000);
                 return accessToken;
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);

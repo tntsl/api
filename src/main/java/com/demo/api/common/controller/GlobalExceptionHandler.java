@@ -1,6 +1,7 @@
 package com.demo.api.common.controller;
 
 import com.demo.api.common.domain.Result;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Lye
- * 统一捕捉shiro的异常，返回给前台一个json信息，前台根据这个信息显示对应的提示，或者做页面的跳转。
  */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -24,12 +24,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Result globalException(HttpServletRequest request, Throwable ex) {
-        LOGGER.error(ex.getMessage(), ex);
-        if (ex instanceof UnauthorizedException) {
+    public Result globalException(HttpServletRequest request, Throwable e) {
+        LOGGER.error(e.getMessage(), e);
+        if (e instanceof UnauthorizedException || e instanceof AuthorizationException) {
             return new Result().set403();
         }
-        return Result.fail().setMessage("请求发生错误，请稍后重试");
+        return new Result().set500().setMessage("请求发生错误，请稍后重试");
     }
 
 }

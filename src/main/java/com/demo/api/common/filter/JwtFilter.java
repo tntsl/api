@@ -1,8 +1,8 @@
 package com.demo.api.common.filter;
 
 import com.demo.api.common.domain.JwtToken;
-import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.domain.Result;
+import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.util.GsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -32,7 +32,7 @@ public class JwtFilter extends AuthenticatingFilter {
     }
 
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
         HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
@@ -41,14 +41,10 @@ public class JwtFilter extends AuthenticatingFilter {
             try {
                 return executeLogin(request, response);
             } catch (Exception e) {
+                LOGGER.trace(e.getMessage(), e);
                 sendErrorMessage(response, e.getMessage());
             }
         }
-        return false;
-    }
-
-    @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         sendErrorMessage(response, "token无效");
         return false;
     }

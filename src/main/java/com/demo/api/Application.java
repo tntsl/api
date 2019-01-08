@@ -1,5 +1,6 @@
 package com.demo.api;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.sidao.swagger.EnableSwagger2Doc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,6 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  * @author Lye
  */
 @EnableSwagger2Doc
+@MapperScan("com.demo.api.mapper")
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
