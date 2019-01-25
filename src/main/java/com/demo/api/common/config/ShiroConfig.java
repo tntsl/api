@@ -109,12 +109,13 @@ public class ShiroConfig {
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
+        factoryBean.setLoginUrl("/user/wechatLogin");
         Map<String, Filter> filterMap = new HashMap(1);
         filterMap.put("jwt", new JwtFilter(systemInfo));
         factoryBean.setFilters(filterMap);
         factoryBean.setSecurityManager(securityManager);
         Map<String, String> filterRuleMap = new HashMap(9);
-        filterRuleMap.put("/user/wechatLogin", "anon");
+//        filterRuleMap.put("/user/wechatLogin", "anon");
         filterRuleMap.put("/error/**", "anon");
         filterRuleMap.put("/webjars/**", "anon");
         filterRuleMap.put("/swagger-resources/**", "anon");

@@ -32,42 +32,28 @@ public class JwtFilter extends AuthenticatingFilter {
     }
 
     @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
-        HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
-        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
-        HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
-        String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
-        if (StringUtils.isNotBlank(token)) {
-            try {
-                return executeLogin(request, response);
-            } catch (Exception e) {
-                LOGGER.trace(e.getMessage(), e);
-                sendErrorMessage(response, e.getMessage());
-            }
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        if (isLoginRequest(request, response)) {
+            return true;
+        } else if (isLoginAttempt(request, response)) {
+            return executeLogin(request, response);
         }
         sendErrorMessage(response, "token无效");
         return false;
     }
 
-    @Override
-    protected boolean executeLogin(ServletRequest request, ServletResponse response) {
-        AuthenticationToken token = createToken(request, response);
-        if (token == null) {
-            return false;
-        }
-        getSubject(request, response).login(token);
-        return true;
-    }
 
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
         String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
-        if (StringUtils.isNotBlank(token)) {
-            return new JwtToken(token);
-        }
-        sendErrorMessage(response, "token无效");
-        return null;
+        return new JwtToken(token);
+    }
+
+    protected Boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
+        HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
+        String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
+        return StringUtils.isNotBlank(token);
     }
 
     /**
@@ -89,4 +75,6 @@ public class JwtFilter extends AuthenticatingFilter {
             LOGGER.error(e.getMessage(), e);
         }
     }
+
+
 }

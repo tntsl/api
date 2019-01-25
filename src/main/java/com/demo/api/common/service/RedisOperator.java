@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class RedisOperator {
-
     @Autowired
     private SystemInfo systemInfo;
+
     @Autowired
     private StringRedisTemplate redisTemplate;
 
@@ -55,13 +55,13 @@ public class RedisOperator {
     }
 
     /**
-     * 指定过期时间
+     * 设置具体过期时间
      *
      * @param key
-     * @param date
+     * @param expireTime
      */
-    public void expireAt(String key, Date date) {
-        redisTemplate.expireAt(key, date);
+    public void expireAt(String key, Date expireTime) {
+        redisTemplate.expireAt(key, expireTime);
     }
 
     /**
@@ -88,6 +88,19 @@ public class RedisOperator {
      */
     public void del(String key) {
         redisTemplate.delete(key);
+    }
+
+    /**
+     * 如果存储值一致，则删除
+     */
+    public void delIfMatch(String key, String value) {
+        if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
+            return;
+        }
+        String storeValue = get(key);
+        if (value.equals(storeValue)) {
+            del(key);
+        }
     }
 
     // String（字符串）
@@ -304,6 +317,18 @@ public class RedisOperator {
         Integer mobileVerifyCodeLimit = getMobileVerifyCodeLimit(mobile);
         mobileVerifyCodeLimit++;
         hset(GlobalConst.MOBILE_REGIST_VERIFYCODE_LIMIT, mobile, String.valueOf(mobileVerifyCodeLimit));
+    }
+
+    /**
+     * 如果不存在则设置
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+
+    public Boolean setNX(String key, String value) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value);
     }
 
 }
