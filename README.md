@@ -9,7 +9,7 @@
 
 1、springboot
 2、shiro
-3、mybatis
+3、mybatisplus
 
 ## Prerequisites
 
