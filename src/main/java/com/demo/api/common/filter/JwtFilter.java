@@ -35,7 +35,7 @@ public class JwtFilter extends AuthenticatingFilter {
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         if (isLoginRequest(request, response)) {
             return true;
-        } else if (isLoginAttempt(request, response)) {
+        } else if (isLoginAttempt(request)) {
             return executeLogin(request, response);
         }
         sendErrorMessage(response, "token无效");
@@ -49,7 +49,7 @@ public class JwtFilter extends AuthenticatingFilter {
         return new JwtToken(token);
     }
 
-    protected Boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
+    protected Boolean isLoginAttempt(ServletRequest request) {
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
         String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
         return StringUtils.isNotBlank(token);
@@ -64,7 +64,7 @@ public class JwtFilter extends AuthenticatingFilter {
     private void sendErrorMessage(ServletResponse response, String message) {
         try {
             HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
-            Result result = new Result().set401().setMessage(message);
+            Result<Object> result = new Result<Object>().set401().setMessage(message);
             httpServletResponse.setHeader("content-type", "application/json; charset=utf-8");
             ServletOutputStream outputStream = response.getOutputStream();
             outputStream.write(GsonUtils.toJson(result).getBytes(StandardCharsets.UTF_8));

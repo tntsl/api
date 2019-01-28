@@ -4,6 +4,7 @@ import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.filter.JwtFilter;
 import com.demo.api.common.filter.UrlRewriteFilter;
 import com.demo.api.common.service.JwtRealm;
+import com.google.common.collect.Maps;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
@@ -15,10 +16,10 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.DelegatingFilterProxy;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,8 +39,8 @@ public class ShiroConfig {
     }
 
     @Bean
-    public FilterRegistrationBean urlRewriteFilterBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<UrlRewriteFilter> urlRewriteFilterBean() {
+        FilterRegistrationBean<UrlRewriteFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(urlRewriteFilter());
         filterRegistrationBean.addUrlPatterns("/*");
         filterRegistrationBean.setOrder(0);
@@ -99,13 +100,13 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
+        factoryBean.setSecurityManager(securityManager);
         factoryBean.setLoginUrl("/user/wechatLogin");
-        Map<String, Filter> filterMap = new HashMap(1);
+        factoryBean.setUnauthorizedUrl("/error/401");
+        Map<String, Filter> filterMap = Maps.newHashMap();
         filterMap.put("jwt", new JwtFilter(systemInfo));
         factoryBean.setFilters(filterMap);
-        factoryBean.setSecurityManager(securityManager);
-        Map<String, String> filterRuleMap = new HashMap(9);
-//        filterRuleMap.put("/user/wechatLogin", "anon");
+        Map<String, String> filterRuleMap = Maps.newHashMap();
         filterRuleMap.put("/error/**", "anon");
         filterRuleMap.put("/webjars/**", "anon");
         filterRuleMap.put("/swagger-resources/**", "anon");
@@ -115,6 +116,16 @@ public class ShiroConfig {
         filterRuleMap.put("/**", "jwt");
         factoryBean.setFilterChainDefinitionMap(filterRuleMap);
         return factoryBean;
+    }
+
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**");
+            }
+        };
     }
 
 }

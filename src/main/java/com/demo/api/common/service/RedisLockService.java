@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisLockService {
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
     /**
      * 锁超时时间，防止线程在入锁以后，无限的执行等待
      */
@@ -69,7 +69,7 @@ public class RedisLockService {
      * 解锁，需提供正确的value值
      */
     public boolean unlock(String lockKey, String lockValue) {
-        String redisStoreValue = (String) redisTemplate.opsForValue().get(lockKey);
+        String redisStoreValue = redisTemplate.opsForValue().get(lockKey);
         if (StringUtils.isNotBlank(lockValue) && lockValue.equals(redisStoreValue)) {
             redisTemplate.delete(lockKey);
             return true;

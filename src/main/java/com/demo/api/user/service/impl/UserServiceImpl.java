@@ -96,11 +96,11 @@ public class UserServiceImpl implements UserService {
             throw new RegistFailException("您已补充个人信息，请不要重复操作");
         }
         String mobile = reqForRegist.getMobile();
-        String RealVerifyCode = redisOperator.getVerifyCodeByMobile(mobile);
-        if (StringUtils.isBlank(RealVerifyCode)) {
+        String realVerifyCode = redisOperator.getVerifyCodeByMobile(mobile);
+        if (StringUtils.isBlank(realVerifyCode)) {
             throw new RegistFailException("验证码过期，请重新获取");
         }
-        if (!RealVerifyCode.equalsIgnoreCase(reqForRegist.getVerifyCode())) {
+        if (!realVerifyCode.equalsIgnoreCase(reqForRegist.getVerifyCode())) {
             throw new RegistFailException("验证码错误，请重新输入");
         }
         redisOperator.delVerifyCodeByMobile(mobile);

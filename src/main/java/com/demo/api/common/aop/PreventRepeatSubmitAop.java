@@ -38,7 +38,7 @@ public class PreventRepeatSubmitAop {
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.PostMapping)")
     private void pointCut() {
-
+        //TODO
     }
 
     @Around(value = "pointCut()", argNames = "proceedingJoinPoint")
@@ -61,7 +61,7 @@ public class PreventRepeatSubmitAop {
         if (!getExecuteFlag) {
             LOGGER.warn("请求重复，访问路径：{}，参数：{}", requestURI, content);
             Class<?> returnType = method.getReturnType();
-            Result result = new Result().set500().setMessage("请不要重复请求");
+            Result<?> result = new Result<Object>().set500().setMessage("请不要重复请求");
             if (returnType.equals(String.class)) {
                 return GsonUtils.toJsonWithNulls(result);
             } else if (returnType.equals(Result.class)) {

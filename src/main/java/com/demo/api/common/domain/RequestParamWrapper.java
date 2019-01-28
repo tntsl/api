@@ -11,7 +11,7 @@ import java.util.*;
  * @author Lye
  */
 public class RequestParamWrapper extends HttpServletRequestWrapper {
-    private final HashMap overridenParameters = Maps.newHashMap();
+    private final HashMap<String, String[]> overridenParameters = Maps.newHashMap();
     private String requestUri = "";
     private StringBuffer requestUrl = new StringBuffer("");
 
@@ -24,9 +24,9 @@ public class RequestParamWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
         if (overridenParameters != null) {
-            List keys = Collections.list(super.getParameterNames());
+            List<String> keys = Collections.list(super.getParameterNames());
             keys.addAll(overridenParameters.keySet());
             return Collections.enumeration(keys);
         }
@@ -34,11 +34,11 @@ public class RequestParamWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Map getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         if (overridenParameters != null) {
-            Map superMap = super.getParameterMap();
+            Map<String, String[]> superMap = super.getParameterMap();
             //superMap is an unmodifiable map, hence creating a new one.
-            Map overriddenMap = new HashMap(superMap.size() + overridenParameters.size());
+            Map<String, String[]> overriddenMap = new HashMap<>(superMap.size() + overridenParameters.size());
             overriddenMap.putAll(superMap);
             overriddenMap.putAll(overridenParameters);
             return overriddenMap;
@@ -49,7 +49,7 @@ public class RequestParamWrapper extends HttpServletRequestWrapper {
     @Override
     public String[] getParameterValues(String s) {
         if (overridenParameters != null && overridenParameters.containsKey(s)) {
-            return (String[]) overridenParameters.get(s);
+            return overridenParameters.get(s);
         }
         return super.getParameterValues(s);
     }
@@ -57,7 +57,7 @@ public class RequestParamWrapper extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String s) {
         if (overridenParameters != null && overridenParameters.containsKey(s)) {
-            String[] values = (String[]) overridenParameters.get(s);
+            String[] values = overridenParameters.get(s);
             if (values == null || values.length == 0) {
                 return null;
             } else {

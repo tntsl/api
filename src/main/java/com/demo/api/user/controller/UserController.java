@@ -39,30 +39,28 @@ public class UserController {
     @PostMapping("wechatLogin")
     public Result<LoginUserInfo> wechatLogin(@RequestBody @Valid ReqForWechatLogin reqForWechatLogin, BindingResult validResult) {
         if (validResult.hasErrors()) {
-            return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
+            return new Result<LoginUserInfo>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
         }
         try {
             LoginUserInfo loginUserInfo = userService.wechatLogin(reqForWechatLogin);
-            return new Result().set200().setData(loginUserInfo);
-        } catch (WechatLoginException e) {
-            return new Result().set500().setMessage(e.getMessage());
-        } catch (PreRegistFailException e) {
-            return new Result().set500().setMessage(e.getMessage());
+            return new Result<LoginUserInfo>().set200().setData(loginUserInfo);
+        } catch (WechatLoginException | PreRegistFailException e) {
+            return new Result<LoginUserInfo>().set500().setMessage(e.getMessage());
         }
     }
 
     @ApiOperation("短信验证码")
     @RequiresUser
     @PostMapping("verifyCode")
-    public Result verifyCode(@RequestBody @Valid ReqForVerifyCode reqForVerifyCode, BindingResult validResult) {
+    public Result<Object> verifyCode(@RequestBody @Valid ReqForVerifyCode reqForVerifyCode, BindingResult validResult) {
         if (validResult.hasErrors()) {
             return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
         }
         try {
             userService.verifyCode(reqForVerifyCode);
-            return new Result().set200().setMessage("验证码短信已发送");
+            return new Result<Object>().set200().setMessage("验证码短信已发送");
         } catch (SendVerifyCodeFailException e) {
-            return new Result().set500().setMessage(e.getMessage());
+            return new Result<Object>().set500().setMessage(e.getMessage());
         }
     }
 
@@ -71,13 +69,13 @@ public class UserController {
     @PostMapping("regist")
     public Result<LoginUserInfo> regist(@RequestBody @Valid ReqForRegist reqForRegist, BindingResult validResult) {
         if (validResult.hasErrors()) {
-            return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
+            return new Result<LoginUserInfo>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
         }
         try {
             LoginUserInfo loginUserInfo = userService.regist(reqForRegist);
-            return new Result().set200().setMessage("补充信息成功").setData(loginUserInfo);
+            return new Result<LoginUserInfo>().set200().setMessage("补充信息成功").setData(loginUserInfo);
         } catch (RegistFailException e) {
-            return new Result().set500().setMessage(e.getMessage());
+            return new Result<LoginUserInfo>().set500().setMessage(e.getMessage());
         }
     }
 }

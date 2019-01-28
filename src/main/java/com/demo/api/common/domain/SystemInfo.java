@@ -1,11 +1,13 @@
 package com.demo.api.common.domain;
 
 import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Lye
  */
 @Data
+@ConfigurationProperties(prefix = "api")
 public class SystemInfo {
     /**
      * 存储微信配置

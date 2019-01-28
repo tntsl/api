@@ -8,6 +8,10 @@ import org.apache.shiro.authc.AuthenticationToken;
  */
 @Data
 public class JwtToken implements AuthenticationToken {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5070522119672582232L;
     private String token;
 
     public JwtToken(String token) {
@@ -16,11 +20,11 @@ public class JwtToken implements AuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return token;
+        return this.token;
     }
 
     @Override
     public Object getCredentials() {
-        return token;
+        return this.token;
     }
 }

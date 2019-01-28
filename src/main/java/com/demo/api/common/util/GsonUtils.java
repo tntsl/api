@@ -53,7 +53,7 @@ public class GsonUtils {
      * @param <T>
      * @return
      */
-    public static <T> T fromJson(String json, TypeToken typeToken) {
+    public static <T> T fromJson(String json, TypeToken<?> typeToken) {
         return gson.fromJson(json, typeToken.getType());
     }
 }

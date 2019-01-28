@@ -44,7 +44,7 @@ public class JwtRealm extends AuthorizingRealm {
      * @return 返回封装了用户信息的 AuthenticationInfo 实例
      */
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) {
         JwtToken jwtToken = (JwtToken) authenticationToken;
         String token = jwtToken.getToken();
         if (!jwtUtils.verify(token)) {

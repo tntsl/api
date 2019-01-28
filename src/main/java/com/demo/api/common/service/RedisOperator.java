@@ -248,7 +248,7 @@ public class RedisOperator {
         if (systemInfo.getTokenExpire() != null) {
             expire = systemInfo.getTokenExpire();
         }
-        expire(loginUserInfoKey, 60 * 60 * expire);
+        expire(loginUserInfoKey, 60L * 60 * expire);
     }
 
     /**
@@ -271,7 +271,7 @@ public class RedisOperator {
     public void setVerifyCodeByMobile(String mobile, String verifyCode) {
         String verifyCodeKey = GlobalConst.MOBILE_REGIST_VERIFYCODE.concat("_").concat(mobile);
         set(verifyCodeKey, verifyCode);
-        expire(verifyCodeKey, 60 * 5);
+        expire(verifyCodeKey, 60L * 5);
     }
 
     /**

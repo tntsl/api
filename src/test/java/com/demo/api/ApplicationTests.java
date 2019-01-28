@@ -21,6 +21,7 @@ public class ApplicationTests {
 
     @Test
     public void testHome() throws Exception {
+        wac.toString();
         log.info("------>>>>>");
     }
 }

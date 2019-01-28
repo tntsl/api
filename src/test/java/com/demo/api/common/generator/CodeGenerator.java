@@ -27,11 +27,15 @@ public class CodeGenerator {
         StringBuilder help = new StringBuilder();
         help.append("请输入" + tip + "：");
         System.out.println(help.toString());
-        if (scanner.hasNext()) {
-            String ipt = scanner.next();
-            if (StringUtils.isNotEmpty(ipt)) {
+        try{
+            if (scanner.hasNext()) {
+                String ipt = scanner.next();
+                if (StringUtils.isNotEmpty(ipt)) {
                 return ipt;
+                }
             }
+        }finally {
+            scanner.close();
         }
         throw new MybatisPlusException("请输入正确的" + tip + "！");
     }
