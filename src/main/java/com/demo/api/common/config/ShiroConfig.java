@@ -78,16 +78,6 @@ public class ShiroConfig {
     }
 
     @Bean
-    public FilterRegistrationBean delegatingFilterProxy() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        DelegatingFilterProxy proxy = new DelegatingFilterProxy();
-        proxy.setTargetFilterLifecycle(true);
-        proxy.setTargetBeanName("shiroFilter");
-        filterRegistrationBean.setFilter(proxy);
-        return filterRegistrationBean;
-    }
-
-    @Bean
     public static DefaultAdvisorAutoProxyCreator getDefaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
         /**
@@ -106,7 +96,7 @@ public class ShiroConfig {
         return authorizationAttributeSourceAdvisor;
     }
 
-    @Bean("shiroFilter")
+    @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         Map<String, Filter> filterMap = new HashMap(1);
@@ -125,14 +115,5 @@ public class ShiroConfig {
         factoryBean.setFilterChainDefinitionMap(filterRuleMap);
         return factoryBean;
     }
-
-
-    /*@Bean
-    public MethodInvokingFactoryBean methodInvokingFactoryBean(DefaultSecurityManager securityManager) {
-        MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
-        methodInvokingFactoryBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
-        methodInvokingFactoryBean.setArguments(securityManager);
-        return methodInvokingFactoryBean;
-    }*/
 
 }
