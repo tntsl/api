@@ -42,7 +42,6 @@ public class JwtFilter extends AuthenticatingFilter {
         return false;
     }
 
-
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);

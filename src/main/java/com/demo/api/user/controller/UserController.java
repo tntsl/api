@@ -5,6 +5,7 @@ import com.demo.api.common.exception.PreRegistFailException;
 import com.demo.api.common.exception.RegistFailException;
 import com.demo.api.common.exception.SendVerifyCodeFailException;
 import com.demo.api.common.exception.WechatLoginException;
+import com.demo.api.common.util.ValidResultUtils;
 import com.demo.api.user.service.UserService;
 import com.demo.api.user.vo.LoginUserInfo;
 import com.demo.api.user.vo.ReqForRegist;
@@ -15,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +37,10 @@ public class UserController {
     @ApiOperation("微信登录")
     @RequiresGuest
     @PostMapping("wechatLogin")
-    public Result<LoginUserInfo> wechatLogin(@RequestBody @Valid ReqForWechatLogin reqForWechatLogin) {
+    public Result<LoginUserInfo> wechatLogin(@RequestBody @Valid ReqForWechatLogin reqForWechatLogin, BindingResult validResult) {
+        if (validResult.hasErrors()) {
+            return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
+        }
         try {
             LoginUserInfo loginUserInfo = userService.wechatLogin(reqForWechatLogin);
             return new Result().set200().setData(loginUserInfo);
@@ -49,7 +54,10 @@ public class UserController {
     @ApiOperation("短信验证码")
     @RequiresUser
     @PostMapping("verifyCode")
-    public Result verifyCode(@RequestBody @Valid ReqForVerifyCode reqForVerifyCode) {
+    public Result verifyCode(@RequestBody @Valid ReqForVerifyCode reqForVerifyCode, BindingResult validResult) {
+        if (validResult.hasErrors()) {
+            return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
+        }
         try {
             userService.verifyCode(reqForVerifyCode);
             return new Result().set200().setMessage("验证码短信已发送");
@@ -61,7 +69,10 @@ public class UserController {
     @ApiOperation("补充信息")
     @RequiresUser
     @PostMapping("regist")
-    public Result<LoginUserInfo> regist(@RequestBody @Valid ReqForRegist reqForRegist) {
+    public Result<LoginUserInfo> regist(@RequestBody @Valid ReqForRegist reqForRegist, BindingResult validResult) {
+        if (validResult.hasErrors()) {
+            return new Result<>().set400().setMessage(ValidResultUtils.resultsToString(validResult));
+        }
         try {
             LoginUserInfo loginUserInfo = userService.regist(reqForRegist);
             return new Result().set200().setMessage("补充信息成功").setData(loginUserInfo);
