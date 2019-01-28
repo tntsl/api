@@ -1,7 +1,7 @@
 package com.demo.api.common.utils;
 
 import com.demo.api.ApplicationTests;
-import com.demo.api.common.util.JwtUtils;
+import com.demo.api.common.service.JwtUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
