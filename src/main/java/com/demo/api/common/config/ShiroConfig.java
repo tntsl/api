@@ -7,11 +7,13 @@ import com.demo.api.common.service.JwtRealm;
 import com.google.common.collect.Maps;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -48,8 +50,8 @@ public class ShiroConfig {
     }
 
     @Bean
-    public DefaultSessionManager sessionManager() {
-        DefaultSessionManager sessionManager = new DefaultSessionManager();
+    public SessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         sessionManager.setSessionValidationSchedulerEnabled(false);
         return sessionManager;
     }
@@ -70,7 +72,7 @@ public class ShiroConfig {
 
 
     @Bean
-    public DefaultWebSecurityManager securityManager(Realm jwtRealm, DefaultSubjectDAO subjectDAO, DefaultSessionManager sessionManager) {
+    public SecurityManager securityManager(Realm jwtRealm, DefaultSubjectDAO subjectDAO, SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(jwtRealm);
         securityManager.setSubjectDAO(subjectDAO);
@@ -81,7 +83,7 @@ public class ShiroConfig {
     @Bean
     public static DefaultAdvisorAutoProxyCreator getDefaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
-        /**
+        /*
          * setUsePrefix(false)用于解决一个奇怪的bug。在引入spring aop的情况下。
          * 在@Controller注解的类的方法中加入@RequiresRole等shiro注解，会导致该方法无法映射请求，导致返回404。
          * 加入这项配置能解决这个bug
@@ -91,14 +93,14 @@ public class ShiroConfig {
     }
 
     @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
         AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
         authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
         return authorizationAttributeSourceAdvisor;
     }
 
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, DefaultWebSecurityManager securityManager) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SystemInfo systemInfo, SecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         factoryBean.setSecurityManager(securityManager);
         factoryBean.setLoginUrl("/user/wechatLogin");

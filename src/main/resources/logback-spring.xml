@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>   <!-- 输出格式 -->
+            <charset>UTF-8</charset> <!-- 解决中文乱码问题 -->
+        </encoder>
+    </appender>
+    <logger name="com.demo.api" level="INFO"/>
+    <logger name="jdbc.audit" level="WARN"/>
+    <logger name="jdbc.resultset" level="WARN"/>
+    <logger name="jdbc.sqltiming" level="WARN"/>
+    <logger name="jdbc.sqlonly" level="INFO"/>
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
