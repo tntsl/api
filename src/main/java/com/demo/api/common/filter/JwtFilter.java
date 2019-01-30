@@ -5,6 +5,7 @@ import com.demo.api.common.domain.Result;
 import com.demo.api.common.domain.SystemInfo;
 import com.demo.api.common.util.GsonUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -53,6 +54,12 @@ public class JwtFilter extends AuthenticatingFilter {
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
         String token = httpServletRequest.getHeader(systemInfo.getTokenHeader());
         return StringUtils.isNotBlank(token);
+    }
+
+    @Override
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
+        sendErrorMessage(response, "token无效");
+        return false;
     }
 
     /**

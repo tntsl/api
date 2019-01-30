@@ -13,7 +13,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  * @author Lye
  */
 @EnableSwagger2Doc
-@MapperScan("com.demo.api.mapper")
 @EnableConfigurationProperties(SystemInfo.class)
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {

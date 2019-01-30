@@ -81,7 +81,7 @@ public class ShiroConfig {
     }
 
     @Bean
-    public static DefaultAdvisorAutoProxyCreator getDefaultAdvisorAutoProxyCreator() {
+    public static DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
         /*
          * setUsePrefix(false)用于解决一个奇怪的bug。在引入spring aop的情况下。

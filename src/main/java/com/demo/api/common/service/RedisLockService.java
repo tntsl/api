@@ -46,7 +46,7 @@ public class RedisLockService {
      * @throws InterruptedException in case of thread interruption
      */
     public String lock(String lockKey) throws InterruptedException {
-        synchronized (RedisLockService.class) {
+        synchronized (redisTemplate) {
             int delayTime = new Random().nextInt(500);
             int timeout = lockWaitTime;
             while (timeout >= 0) {
@@ -69,10 +69,12 @@ public class RedisLockService {
      * 解锁，需提供正确的value值
      */
     public boolean unlock(String lockKey, String lockValue) {
-        String redisStoreValue = redisTemplate.opsForValue().get(lockKey);
-        if (StringUtils.isNotBlank(lockValue) && lockValue.equals(redisStoreValue)) {
-            redisTemplate.delete(lockKey);
-            return true;
+        synchronized (redisTemplate) {
+            String redisStoreValue = redisTemplate.opsForValue().get(lockKey);
+            if (StringUtils.isNotBlank(lockValue) && lockValue.equals(redisStoreValue)) {
+                redisTemplate.delete(lockKey);
+                return true;
+            }
         }
         return false;
     }

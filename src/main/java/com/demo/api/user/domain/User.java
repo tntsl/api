@@ -21,5 +21,4 @@ public class User {
     private Date createTime;
     private Date activeTime;
     private Date lastLoginTime;
-    private String userStatus;
 }
